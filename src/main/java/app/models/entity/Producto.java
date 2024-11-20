@@ -1,6 +1,8 @@
 package app.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,14 +18,13 @@ public class Producto implements Serializable {
     private String nombre;
     private Double precio;
 
-    @Temporal(TemporalType.DATE)
+    @NotNull
     @Column(name = "create_at")
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
 
-    @PrePersist
-    public void prePersist() {
-        createAt = new Date();
-    }
+    private String foto;
 
     public Long getId() {
         return id;
@@ -55,6 +56,14 @@ public class Producto implements Serializable {
 
     public void setCreateAt(Date createAt) {
         this.createAt = createAt;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     private static final long serialVersionUID = 1L;

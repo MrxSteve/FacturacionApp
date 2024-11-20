@@ -9,7 +9,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-6">
-                    <img th:if="${cliente.foto != null and cliente.foto != ''}" th:src="@{|/uploads/${cliente.foto}|}"
+                    <img th:if="${cliente.foto != null and cliente.foto != ''}" th:src="@{|/uploads/clientes/${cliente.foto}|}"
                          class="img-thumbnail rounded float-left" th:alt="${cliente.foto}" style="max-width: 40%"/>
                 </div>
                 <div class="col-6">

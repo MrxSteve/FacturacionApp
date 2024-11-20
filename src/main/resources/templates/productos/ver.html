@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/layout :: head"></head>
+<body>
+<header th:replace="layout/layout :: header"></header>
+<div class="container py-4">
+    <div class="card bg-light">
+        <div class="card-header text-primary h1" th:text="${titulo}"></div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <img th:if="${producto.foto != null and producto.foto != ''}"
+                         th:src="@{|/uploads/productos/${producto.foto}|}"
+                         class="img-thumbnail rounded float-left" th:alt="${producto.foto}"
+                         style="max-width: 40%" />
+                </div>
+                <div class="col-6">
+                    <p><strong>Nombre:</strong> <span th:text="${producto.nombre}"></span></p>
+                    <p><strong>Precio:</strong> <span th:text="${producto.precio}"></span></p>
+                    <p><strong>Fecha de creación:</strong> <span th:text="${#dates.format(producto.createAt, 'dd/MM/yyyy')}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="/productos/listar" class="btn btn-primary mt-2">Volver</a>
+</div>
+
+<footer th:replace="layout/layout :: footer"></footer>
+
+</body>
+</html>

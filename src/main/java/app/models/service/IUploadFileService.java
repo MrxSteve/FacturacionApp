@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 public interface IUploadFileService {
-    public Resource load(String filename) throws MalformedURLException;
-    public String copy(MultipartFile file) throws IOException;
-    public boolean delete(String filename);
+    Resource load(String filename, String subfolder) throws MalformedURLException;
 
-//    public void deleteAll();
-//    public void init() throws IOException;
+    String copy(MultipartFile file, String subfolder) throws IOException;
+
+    boolean delete(String filename, String subfolder);
 }

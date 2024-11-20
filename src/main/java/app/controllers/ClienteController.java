@@ -24,10 +24,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Map;
 
-
 @Controller
 @SessionAttributes("cliente")
 public class ClienteController {
+
+    private static final String CLIENTES_FOLDER = "clientes";
 
     private final IClienteSevice clienteSevice;
     private final IUploadFileService uploadFileService;
@@ -38,18 +39,18 @@ public class ClienteController {
         this.uploadFileService = uploadFileService;
     }
 
-    @GetMapping(value = "/uploads/{filename:.+}")
+    @GetMapping(value = "/uploads/clientes/{filename:.+}")
     public ResponseEntity<Resource> verFoto(@PathVariable String filename) {
-
         Resource recurso = null;
         try {
-            recurso = uploadFileService.load(filename);
+            recurso = uploadFileService.load(filename, CLIENTES_FOLDER);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
 
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + recurso.getFilename() + "\"").body(recurso);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+                .body(recurso);
     }
 
     @GetMapping(value = "/ver/{id}")
@@ -65,10 +66,8 @@ public class ClienteController {
     }
 
     @RequestMapping(value = "/listar", method = RequestMethod.GET)
-    public String listar(@RequestParam(name="page", defaultValue="0") int page, Model model) {
-
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
         Pageable pageRequest = PageRequest.of(page, 5);
-
         Page<Cliente> clientes = clienteSevice.findAll(pageRequest);
 
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
@@ -88,33 +87,30 @@ public class ClienteController {
     }
 
     @RequestMapping(value = "/form", method = RequestMethod.POST)
-    public String guardar(@Valid Cliente cliente, BindingResult result, Model model, @RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
+    public String guardar(@Valid Cliente cliente, BindingResult result, Model model,
+                          @RequestParam("file") MultipartFile foto, RedirectAttributes flash, SessionStatus status) {
 
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Formulario de Cliente");
             return "form";
         }
         if (!foto.isEmpty()) {
-
-            if (cliente.getId() != null
-                    && cliente.getId() > 0
-                    && cliente.getFoto() != null
+            if (cliente.getId() != null && cliente.getId() > 0 && cliente.getFoto() != null
                     && cliente.getFoto().length() > 0) {
-
-                uploadFileService.delete(cliente.getFoto());
+                uploadFileService.delete(cliente.getFoto(), CLIENTES_FOLDER);
             }
 
             String uniqueFilename = null;
             try {
-                uniqueFilename = uploadFileService.copy(foto);
+                uniqueFilename = uploadFileService.copy(foto, CLIENTES_FOLDER);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
             flash.addFlashAttribute("info", "Has subido correctamente '" + uniqueFilename + "'");
             cliente.setFoto(uniqueFilename);
-
         }
+
         String mensajeFlash = (cliente.getId() != null) ? "Cliente editado con éxito" : "Cliente creado con éxito";
 
         clienteSevice.save(cliente);
@@ -127,9 +123,9 @@ public class ClienteController {
     public String editar(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
         Cliente cliente = null;
 
-        if (id>0) {
+        if (id > 0) {
             cliente = clienteSevice.findOne(id);
-            if(cliente == null) {
+            if (cliente == null) {
                 flash.addFlashAttribute("error", "El ID del cliente no existe en la BD!");
                 return "redirect:/listar";
             }
@@ -146,14 +142,15 @@ public class ClienteController {
 
     @RequestMapping(value = "/eliminar/{id}")
     public String eliminar(@PathVariable(value = "id") Long id, RedirectAttributes flash) {
-        if (id>0) {
+        if (id > 0) {
             Cliente cliente = clienteSevice.findOne(id);
             clienteSevice.delete(id);
             flash.addFlashAttribute("success", "Cliente eliminado con éxito");
 
-
-            if (uploadFileService.delete(cliente.getFoto())) {
-                flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " eliminada con éxito");
+            if (cliente.getFoto() != null) {
+                if (uploadFileService.delete(cliente.getFoto(), CLIENTES_FOLDER)) {
+                    flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " eliminada con éxito");
+                }
             }
         }
         return "redirect:/listar";
