@@ -1,31 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="layout/layout :: head"></head>
 <body>
+
 <header th:replace="layout/layout :: header"></header>
+
 <div class="container py-4">
     <div class="card bg-light">
         <div class="card-header text-primary h1" th:text="${titulo}"></div>
         <div class="card-body">
             <div class="row">
                 <div class="col-6">
-                    <img th:if="${cliente.foto != null and cliente.foto != ''}" th:src="@{|/uploads/clientes/${cliente.foto}|}"
-                         class="img-thumbnail rounded float-left" th:alt="${cliente.foto}" style="max-width: 40%"/>
+                    <img th:if="${#strings.length(cliente.foto) > 0}"
+                         class="img-thumbnail rounded float-left" style="max-width: 25%;"
+                         th:src="@{'/uploads/clientes/' + ${cliente.foto}}" th:alt="${cliente.foto}" />
                 </div>
                 <div class="col-6">
-                    <p><strong>Nombre:</strong> <span th:text="${cliente.nombre}"></span></p>
-                    <p><strong>Apellido:</strong> <span th:text="${cliente.apellido}"></span></p>
-                    <p><strong>Email:</strong> <span th:text="${cliente.email}"></span></p>
-                    <p><strong>Fecha:</strong> <span th:text="${#dates.format(cliente.createAt, 'dd/MM/yyyy')}"></span></p>
+                    <p><strong>Nombre: </strong> <span th:text="${cliente.nombre}"></span></p>
+                    <p><strong>Apellido: </strong> <span th:text="${cliente.apellido}"></span></p>
+                    <p><strong>Email: </strong> <span th:text="${cliente.email}"></span></p>
+                    <p><strong>Fecha de creacion: </strong> <span th:text="${cliente.createAt}"></span></p>
                 </div>
             </div>
+            <h4 class="card-title">
+                <a class="btn btn-primary"
+                   th:href="@{'/factura/form/' + ${cliente.id}}"
+                   th:text="'crear factura'"></a>
+            </h4>
+
+            <div th:if="${#lists.isEmpty(cliente.facturas)}"
+                 class="alert alert-info my-4"
+                 th:text="'No hay facturas asignadas para el cliente ' + ${cliente.nombre} + ' ' + ${cliente.apellido}"></div>
+
+            <table th:if="${not #lists.isEmpty(cliente.facturas)}"
+                   class="table table-bordered table-striped my-4">
+                <thead class="thead-dark">
+                <tr>
+                    <th>Folio</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Ver</th>
+                    <th>Eliminar</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="factura: ${cliente.facturas}">
+                    <td th:text="${factura.id}"></td>
+                    <td th:text="${factura.descripcion}"></td>
+                    <td th:text="${factura.createAt}"></td>
+                    <td th:text="${factura.total}"></td>
+                    <td><a class="btn btn-primary btn-sm" th:href="@{'/factura/ver/' + ${factura.id}}" th:text="'detalle'"></a></td>
+                    <td><a class="btn btn-danger btn-sm" th:href="@{'/factura/eliminar/' + ${factura.id}}" th:text="'eliminar'"
+                           onclick="return confirm('¿Estas seguro que desea eliminar la factura?');"></a></td>
+                </tr>
+                </tbody>
+
+            </table>
+
         </div>
     </div>
 
-    <a href="/listar" class="btn btn-primary mt-2">Volver</a>
 </div>
 
 <footer th:replace="layout/layout :: footer"></footer>
-
 </body>
 </html>

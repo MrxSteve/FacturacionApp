@@ -1,5 +1,6 @@
 package app.models.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,6 +25,7 @@ public class Producto implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createAt;
 
+    @Nullable
     private String foto;
 
     public Long getId() {

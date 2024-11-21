@@ -1,6 +1,7 @@
 package app.models.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class Factura implements Serializable {
     private Long id;
 
     private String descripcion;
+    @NotEmpty
     private String observacion;
     @Temporal(TemporalType.DATE)
     @Column(name = "create_at")
