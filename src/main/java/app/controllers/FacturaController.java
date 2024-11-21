@@ -112,7 +112,7 @@ public class FacturaController {
         return "redirect:/ver/" + factura.getCliente().getId();
     }
 
-    @GetMapping("/eliminar/{id}")
+    @GetMapping("/factura/eliminar/{id}")
     public String eliminar(@PathVariable(value="id") Long id, RedirectAttributes flash) {
 
         Factura factura = clienteService.findFacturaById(id);

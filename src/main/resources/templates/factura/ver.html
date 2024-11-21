@@ -44,15 +44,15 @@
 							<th>Producto</th>
 							<th>Precio</th>
 							<th>Cantidad</th>
-							<th>Total</th>
+							<th>SubTotal</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="linea: ${factura.items}">
 							<td th:text="${linea.producto.nombre}"></td>
-							<td th:text="${linea.producto.precio}"></td>
+							<td th:text="'$' + ${linea.producto.precio}"></td>
 							<td th:text="${linea.cantidad}"></td>
-							<td th:text="${linea.calcularImporte()}"></td>
+							<td th:text="'$' + ${linea.calcularImporte()}"></td>
 						</tr>
 					</tbody>
 

@@ -7,10 +7,10 @@
 
 <div class="container py-4">
   <div class="card bg-light">
-    <div class="card-header" th:text="${titulo}"></div>
+    <div class="card-header text-primary h1" th:text="${titulo}"></div>
     <div class="card-body">
       <h4 class="card-title">
-        <a class="btn btn-light"
+        <a class="btn btn-secondary"
            th:href="@{'/ver/' + ${factura.cliente.id}}"
            th:text="'&laquo; volver'"></a>
       </h4>
@@ -18,7 +18,7 @@
       <form th:action="@{/factura/form}" th:object="${factura}"
             method="post">
 
-        <div class="form-group row">
+        <div class="form-group row my-3">
           <label class="col-sm-2 col-form-label"
                  th:text="'Cliente'"></label>
           <div class="col-sm-6">
@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row my-3">
           <label class="col-sm-2 col-form-label"
                  th:text="'Descripción'"></label>
           <div class="col-sm-6">
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row my-3">
           <label class="col-sm-2 col-form-label"
                  th:text="'Observación'"></label>
           <div class="col-sm-6">
@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row my-3">
           <label for="buscar_producto" class="col-sm-2 col-form-label"
                  th:text="'Buscar producto'"></label>
           <div class="col-sm-6">
@@ -63,14 +63,14 @@
             <th>Nombre</th>
             <th>Precio</th>
             <th>Cantidad</th>
-            <th>Total</th>
+            <th>SubTotal</th>
             <th>Eliminar</th>
           </tr>
           </thead>
           <tbody>
           </tbody>
         </table>
-        <h5>Total <span class="badge badge-secondary bg-dark" id="gran_total">0</span></h5>
+        <h5>Total $<span class="badge badge-secondary bg-dark" id="gran_total">0</span></h5>
 
         <div class="form-group row">
           <div class="col-sm-6">

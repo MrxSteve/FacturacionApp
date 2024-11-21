@@ -15,8 +15,8 @@ public class Factura implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descripcion;
     @NotEmpty
+    private String descripcion;
     private String observacion;
     @Temporal(TemporalType.DATE)
     @Column(name = "create_at")
