@@ -11,12 +11,13 @@
 <header th:fragment="header">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Spring boot</a>
+            <a class="navbar-brand" href="#">Spring Boot</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                <!-- Links de navegación -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="#">Home</a>
@@ -28,9 +29,20 @@
                         <a class="nav-link" th:href="@{/productos/listar}">Productos</a>
                     </li>
                 </ul>
+                <!-- Mensaje centrado y botón de cerrar sesión -->
+                <div class="d-flex align-items-center">
+                    <span class="navbar-text me-3" th:if="${#authentication != null}" th:text="'Bienvenido, ' + ${#authentication.name}"></span>
+                    <a class="btn btn-outline-light btn-sm" th:if="${#authentication != null}" th:href="@{/logout}">Cerrar sesión</a>
+                    <a class="btn btn-outline-light btn-sm" th:if="${#authentication == null}" th:href="@{/login}">Iniciar sesión</a>
+                </div>
             </div>
         </div>
     </nav>
+
+
+
+
+
 
     <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
     <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>

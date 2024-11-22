@@ -5,12 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 // Si queremos eliminar todas las imagenes al cargar la aplicacion descomentamos las siguientes lineas
 // y tambien descomentamos las lineas que estan en UploadFileServiceImp y IUploadFileService
 
 @SpringBootApplication
-public class DataJpaApplication { //implements CommandLineRunner
+public class DataJpaApplication implements CommandLineRunner { //implements CommandLineRunner
 
 //    @Autowired
 //    private IUploadFileService uploadFileService;
@@ -19,10 +20,11 @@ public class DataJpaApplication { //implements CommandLineRunner
         SpringApplication.run(DataJpaApplication.class, args);
     }
 
-//    @Override
-//    public void run(String... args) throws Exception {
+    @Override
+    public void run(String... args) throws Exception {
 //        uploadFileService.deleteAll();
 //        uploadFileService.init();
-//    }
+
+    }
 
 }
