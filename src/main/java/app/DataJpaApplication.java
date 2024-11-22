@@ -11,7 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 // y tambien descomentamos las lineas que estan en UploadFileServiceImp y IUploadFileService
 
 @SpringBootApplication
-public class DataJpaApplication implements CommandLineRunner { //implements CommandLineRunner
+public class DataJpaApplication { //implements CommandLineRunner
 
 //    @Autowired
 //    private IUploadFileService uploadFileService;
@@ -20,11 +20,11 @@ public class DataJpaApplication implements CommandLineRunner { //implements Comm
         SpringApplication.run(DataJpaApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+//    @Override
+//    public void run(String... args) throws Exception {
 //        uploadFileService.deleteAll();
 //        uploadFileService.init();
 
-    }
+    //}
 
 }

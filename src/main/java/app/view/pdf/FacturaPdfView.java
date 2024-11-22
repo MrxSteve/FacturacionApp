@@ -9,7 +9,6 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractPdfView;
 
@@ -19,7 +18,7 @@ import java.util.Map;
 @Component("factura/ver")
 public class FacturaPdfView extends AbstractPdfView {
     @Override
-    protected void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
+    public void buildPdfDocument(Map<String, Object> model, Document document, PdfWriter writer,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         Factura factura = (Factura) model.get("factura");
