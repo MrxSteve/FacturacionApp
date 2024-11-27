@@ -101,4 +101,9 @@ public class ClienteServiceImp implements IClienteSevice {
     public Cliente fetchByIdWithFacturas(Long id) {
         return clienteDao.fetchByIdWithFacturas(id);
     }
+
+    @Override
+    public Page<Factura> findFacturasByClienteId(Long clienteId, Pageable pageable) {
+        return facturaDao.findByClienteId(clienteId, pageable);
+    }
 }

@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.models.entity.Cliente;
+import app.models.entity.Factura;
 import app.models.service.IClienteSevice;
 import app.models.service.IUploadFileService;
 import app.util.paginator.PageRender;
@@ -54,14 +55,25 @@ public class ClienteController {
     }
 
     @GetMapping(value = "/ver/{id}")
-    public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash) {
-        Cliente cliente = clienteSevice.fetchByIdWithFacturas(id); // clienteSevice.findOne(id);
+    public String ver(@PathVariable(value = "id") Long id,
+                      @RequestParam(name = "page", defaultValue = "0") int page,
+                      Model model,
+                      RedirectAttributes flash) {
+        Cliente cliente = clienteSevice.findOne(id); // clienteSevice.fetchByIdWithFacturas(id);
         if (cliente == null) {
             flash.addFlashAttribute("error", "El cliente no existe en la BD");
             return "redirect:/listar";
         }
-        model.put("cliente", cliente);
-        model.put("titulo", "Detalle cliente: " + cliente.getNombre());
+
+        Pageable pageable = PageRequest.of(page, 5); // Paginación con 5 elementos por página
+        Page<Factura> facturas = clienteSevice.findFacturasByClienteId(id, pageable);
+
+        PageRender<Factura> pageRender = new PageRender<>("/ver/" + id, facturas);
+
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("facturas", facturas);
+        model.addAttribute("page", pageRender);
+        model.addAttribute("titulo", "Detalle cliente: " + cliente.getNombre());
         return "ver";
     }
 

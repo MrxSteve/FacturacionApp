@@ -29,4 +29,6 @@ public interface IClienteSevice {
 
     public Cliente fetchByIdWithFacturas(Long id);
 
+    Page<Factura> findFacturasByClienteId(Long clienteId, Pageable pageable);
+
 }
