@@ -106,4 +106,11 @@ public class ClienteServiceImp implements IClienteSevice {
     public Page<Factura> findFacturasByClienteId(Long clienteId, Pageable pageable) {
         return facturaDao.findByClienteId(clienteId, pageable);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Cliente> findByNombreContaining(String nombre, Pageable pageable) {
+        return clienteDao.findByNombreContainingIgnoreCase(nombre, pageable);
+    }
+
 }

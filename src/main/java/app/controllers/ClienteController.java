@@ -78,15 +78,24 @@ public class ClienteController {
     }
 
     @RequestMapping(value = {"/listar", "/"}, method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page,
+                         @RequestParam(name = "nombre", required = false) String nombre,
+                         Model model) {
         Pageable pageRequest = PageRequest.of(page, 5);
-        Page<Cliente> clientes = clienteSevice.findAll(pageRequest);
+        Page<Cliente> clientes;
+
+        if (nombre != null && !nombre.isEmpty()) {
+            clientes = clienteSevice.findByNombreContaining(nombre, pageRequest);
+        } else {
+            clientes = clienteSevice.findAll(pageRequest);
+        }
 
         PageRender<Cliente> pageRender = new PageRender<>("/listar", clientes);
 
         model.addAttribute("titulo", "Listado de clientes");
         model.addAttribute("clientes", clientes);
         model.addAttribute("page", pageRender);
+        model.addAttribute("nombre", nombre);
         return "listar";
     }
 

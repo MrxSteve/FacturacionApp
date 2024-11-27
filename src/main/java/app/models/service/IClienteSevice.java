@@ -31,4 +31,6 @@ public interface IClienteSevice {
 
     Page<Factura> findFacturasByClienteId(Long clienteId, Pageable pageable);
 
+    public Page<Cliente> findByNombreContaining(String nombre, Pageable pageable);
+
 }
