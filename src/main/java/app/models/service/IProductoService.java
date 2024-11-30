@@ -13,4 +13,5 @@ public interface IProductoService {
     public Producto findOne(Long id);
     public void delete(Long id);
 
+    Page<Producto> findByNombreContaining(String nombre, Pageable pageable);
 }

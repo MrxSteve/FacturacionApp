@@ -50,4 +50,10 @@ public class ProductoServiceImp implements IProductoService {
         productoDao.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Producto> findByNombreContaining(String nombre, Pageable pageable) {
+        return productoDao.findByNombreLikeIgnoreCase("%" + nombre + "%", pageable);
+    }
+
 }

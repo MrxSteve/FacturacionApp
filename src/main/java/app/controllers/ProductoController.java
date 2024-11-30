@@ -65,16 +65,25 @@ public class ProductoController {
         return "productos/ver";
     }
 
-    @RequestMapping(value = "/productos/listar", method = RequestMethod.GET)
-    public String listar(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+    @RequestMapping(value = {"/productos/listar", "/productos/"}, method = RequestMethod.GET)
+    public String listar(@RequestParam(name = "page", defaultValue = "0") int page,
+                         @RequestParam(name = "nombre", required = false) String nombre,
+                         Model model) {
         Pageable pageRequest = PageRequest.of(page, 5);
-        Page<Producto> productos = productoService.findAll(pageRequest);
+        Page<Producto> productos;
+
+        if (nombre != null && !nombre.isEmpty()) {
+            productos = productoService.findByNombreContaining(nombre, pageRequest);
+        } else {
+            productos = productoService.findAll(pageRequest);
+        }
 
         PageRender<Producto> pageRender = new PageRender<>("/productos/listar", productos);
 
         model.addAttribute("titulo", "Listado de productos");
         model.addAttribute("productos", productos);
         model.addAttribute("page", pageRender);
+        model.addAttribute("nombre", nombre);
         return "productos/listar";
     }
 
