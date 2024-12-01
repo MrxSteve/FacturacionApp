@@ -6,11 +6,23 @@ import app.models.entity.Factura;
 import app.models.entity.Producto;
 import app.models.service.IClienteSevice;
 import app.models.service.EmailService;
+import app.models.service.IFacturaService;
 import app.models.service.PdfService;
+import app.util.paginator.PageRender;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.expression.ParseException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +30,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +44,14 @@ public class FacturaController {
     private final EmailService emailService;
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final PdfService pdfService;
+    private final IFacturaService facturaService;
 
     @Autowired
-    public FacturaController(IClienteSevice clienteService, EmailService emailService, PdfService pdfService) {
+    public FacturaController(IClienteSevice clienteService, EmailService emailService, PdfService pdfService, IFacturaService facturaService) {
         this.clienteService = clienteService;
         this.emailService = emailService;
         this.pdfService = pdfService;
+        this.facturaService = facturaService;
     }
 
 
@@ -150,5 +167,78 @@ public class FacturaController {
         flash.addFlashAttribute("error", "La factura no existe en la base de datos, no se pudo eliminar!");
 
         return "redirect:/listar";
+    }
+
+
+    @GetMapping("/factura/rango")
+    public String listarFacturasPorRango(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            Model model) {
+
+        Pageable pageRequest = PageRequest.of(page, 5);
+        Page<Factura> facturas = Page.empty();
+        double totalFacturas = 0;
+        long cantidadFacturas = 0;
+
+        if (startDate != null && endDate != null) {
+            // Obtener las facturas paginadas
+            facturas = facturaService.findByDateRange(startDate, endDate, pageRequest);
+
+            // Obtener todas las facturas en el rango (sin paginación)
+            List<Factura> todasFacturas = facturaService.findAllByDateRange(startDate, endDate);
+
+            // Sumar el total de todas las facturas utilizando el método getTotal()
+            totalFacturas = todasFacturas.stream().mapToDouble(Factura::getTotal).sum();
+
+            // Cantidad total de facturas encontradas
+            cantidadFacturas = facturas.getTotalElements();
+        }
+
+        PageRender<Factura> pageRender = new PageRender<>("/factura/rango", facturas);
+
+        model.addAttribute("titulo", "Listado de facturas por rango de fechas");
+        model.addAttribute("facturas", facturas);
+        model.addAttribute("page", pageRender);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("totalFacturas", totalFacturas);
+        model.addAttribute("cantidadFacturas", cantidadFacturas);
+
+        return "factura/rango";
+    }
+
+
+
+
+    @GetMapping("/factura/rango/pdf")
+    public void exportarFacturasPorRangoAPdf(
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            HttpServletResponse response) throws IOException {
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE); // No limit for PDF export
+        Page<Factura> facturas = facturaService.findByDateRange(startDate, endDate, pageable);
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=factura.pdf");
+
+        // Lógica para convertir las facturas a PDF y escribir en la respuesta
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+            for (Factura factura : facturas) {
+                document.add(new Paragraph("Factura ID: " + factura.getId()));
+                document.add(new Paragraph("Cliente: " + factura.getCliente().getNombre()));
+                document.add(new Paragraph("Fecha: " + factura.getCreateAt()));
+                document.add(new Paragraph("Total: " + factura.getTotal()));
+                document.add(new Paragraph(" "));
+            }
+        } catch (DocumentException e) {
+            throw new IOException(e);
+        } finally {
+            document.close();
+        }
     }
 }
