@@ -209,36 +209,29 @@ public class FacturaController {
         return "factura/rango";
     }
 
-
-
-
     @GetMapping("/factura/rango/pdf")
-    public void exportarFacturasPorRangoAPdf(
-            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
-            HttpServletResponse response) throws IOException {
-        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE); // No limit for PDF export
-        Page<Factura> facturas = facturaService.findByDateRange(startDate, endDate, pageable);
+    public void exportarFacturasPdf(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            HttpServletResponse response) {
 
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=factura.pdf");
+        Pageable pageRequest = PageRequest.of(0, Integer.MAX_VALUE); // Obtenemos todas las facturas en el rango
+        Page<Factura> facturasPage = facturaService.findByDateRange(startDate, endDate, pageRequest);
 
-        // Lógica para convertir las facturas a PDF y escribir en la respuesta
-        Document document = new Document();
+        List<Factura> facturas = facturasPage.getContent();
+        Integer cantidadFacturas = facturas.size();
+        Double totalFacturas = facturas.stream().mapToDouble(Factura::getTotal).sum();
+
         try {
-            PdfWriter.getInstance(document, response.getOutputStream());
-            document.open();
-            for (Factura factura : facturas) {
-                document.add(new Paragraph("Factura ID: " + factura.getId()));
-                document.add(new Paragraph("Cliente: " + factura.getCliente().getNombre()));
-                document.add(new Paragraph("Fecha: " + factura.getCreateAt()));
-                document.add(new Paragraph("Total: " + factura.getTotal()));
-                document.add(new Paragraph(" "));
-            }
-        } catch (DocumentException e) {
-            throw new IOException(e);
-        } finally {
-            document.close();
+            byte[] pdfBytes = pdfService.generarFacturasPdf(facturas, cantidadFacturas, totalFacturas);
+
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=Facturas_Rango.pdf");
+            response.getOutputStream().write(pdfBytes);
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 }

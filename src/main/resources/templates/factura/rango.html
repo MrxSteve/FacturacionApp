@@ -16,6 +16,7 @@
                     <button class="btn btn-outline-primary" type="submit">Buscar</button>
                 </div>
             </form>
+
             <div th:if="${facturas.content.size() > 0}">
                 <table class="table table-striped table-bordered mt-3">
                     <thead class="thead-dark">
@@ -39,8 +40,12 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- Exportar a PDF con Resumen -->
                 <div class="d-flex align-items-center mt-3">
-                    <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{'/factura/rango/pdf(startDate=' + ${#dates.format(startDate, 'yyyy-MM-dd')} + ', endDate=' + ${#dates.format(endDate, 'yyyy-MM-dd')} + ')'}" class="btn btn-outline-primary">Exportar a PDF</a>
+                    <a sec:authorize="hasRole('ROLE_ADMIN')"
+                       th:href="@{'/factura/rango/pdf'(startDate=${#dates.format(startDate, 'yyyy-MM-dd')}, endDate=${#dates.format(endDate, 'yyyy-MM-dd')})}"
+                       class="btn btn-outline-danger">Exportar a PDF</a>
                     <div class="ms-3">
                         <p class="mb-0 text-primary">
                             <strong th:text="'Cantidad de facturas encontradas: ' + ${cantidadFacturas}"></strong>
@@ -50,10 +55,14 @@
                         </p>
                     </div>
                 </div>
+
+                <!-- Paginación -->
                 <div class="mt-3">
                     <nav th:if="${page.totalPaginas > 1}" th:replace="paginator-nav :: paginator(page=${page}, startDate=${#dates.format(startDate, 'yyyy-MM-dd')}, endDate=${#dates.format(endDate, 'yyyy-MM-dd')})"></nav>
                 </div>
             </div>
+
+            <!-- Mensaje si no hay facturas encontradas -->
             <div th:if="${cantidadFacturas == 0}" class="mt-3">
                 <p class="text-warning">No se encontraron facturas en el rango de fechas seleccionado.</p>
             </div>
